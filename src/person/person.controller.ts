@@ -36,6 +36,8 @@ export class PersonController {
   // json
   @Post('post')
   postBody(@Body() createPersonDto: CreatePersonDto) {
+    console.log(createPersonDto);
+    debugger;
     return `result: ${JSON.stringify(createPersonDto)}`;
   }
 
