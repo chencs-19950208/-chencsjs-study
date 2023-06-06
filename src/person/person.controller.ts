@@ -1,34 +1,59 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
+
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
-import { UpdatePersonDto } from './dto/update-person.dto';
 
-@Controller('person')
+// 从上往下匹配
+@Controller('api/person')
 export class PersonController {
   constructor(private readonly personService: PersonService) {}
 
+  // form-data 一般用于文件传输
+  @Post('files')
+  @UseInterceptors(
+    AnyFilesInterceptor({
+      dest: 'uploads/',
+    }),
+  )
+  bodyFiles(
+    @Body() createPersonDto: CreatePersonDto,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    console.log(files, 'files --- ');
+    return `result: ${JSON.stringify(createPersonDto)}`;
+  }
+
+  // json
+  @Post('post')
+  postBody(@Body() createPersonDto: CreatePersonDto) {
+    return `result: ${JSON.stringify(createPersonDto)}`;
+  }
+
+  // x-www-form-urlencoded
   @Post()
-  create(@Body() createPersonDto: CreatePersonDto) {
-    return this.personService.create(createPersonDto);
+  body(@Body() createPersonDto: CreatePersonDto) {
+    return `result: ${JSON.stringify(createPersonDto)}`;
   }
 
-  @Get()
-  findAll() {
-    return this.personService.findAll();
+  // url query
+  @Get('find')
+  query(@Query('name') name: string, @Query('age') age: number) {
+    return `result: name=${name} age=${age}`;
   }
 
+  // url params
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.personService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePersonDto: UpdatePersonDto) {
-    return this.personService.update(+id, updatePersonDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.personService.remove(+id);
+  urlParam(@Param('id') id: string) {
+    return `data: id=${id}`;
   }
 }
