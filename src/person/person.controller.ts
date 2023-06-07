@@ -9,10 +9,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
-
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
-
 // 从上往下匹配
 @Controller('api/person')
 export class PersonController {
